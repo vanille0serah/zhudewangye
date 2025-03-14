@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ColorChat.AI - 色彩丰富的AI对话平台</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #f8f9fa;
+      --sidebar-bg: #ffffff;
+      --primary: #6c5ce7;
+      --secondary: #a29bfe;
+      --accent1: #fd79a8;
+      --accent2: #00cec9;
+      --accent3: #fdcb6e;
+      --accent4: #ff7675;
+      --text-dark: #2d3436;
+      --text-light: #636e72;
+      --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+      --hover-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+      --border-radius: 16px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-dark);
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* Sidebar Styles */
+    .sidebar {
+      width: 320px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .app-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .app-title .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+    }
+    
+    .app-title h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--accent1));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .new-chat-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 25px;
+      width: 100%;
+    }
+    
+    .new-chat-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 5px;
+      color: var(--text-dark);
+    }
+    
+    .nav-item:hover {
+      background-color: rgba(108, 92, 231, 0.1);
+      color: var(--primary);
+    }
+    
+    .nav-item.active {
+      background-color: rgba(108, 92, 231, 0.15);
+      color: var(--primary);
+      font-weight: 500;
+    }
+    
+    .nav-item i {
+      font-size: 18px;
+      opacity: 0.8;
+    }
+    
+    .divider {
+      height: 1px;
+      background-color: rgba(0, 0, 0, 0.05);
+      margin: 15px 0;
+    }
+    
+    .recent-chats-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-light);
+    }
+    
+    .chat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 5px;
+    }
+    
+    .chat-item:hover {
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+    
+    .chat-item.active {
+      background-color: rgba(108, 92, 231, 0.1);
+    }
+    
+    .chat-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: white;
+    }
+    
+    .chat-icon.design {
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    }
+    
+    .chat-icon.food {
+      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    }
+    
+    .chat-icon.productivity {
+      background: linear-gradient(135deg, #ffecd2, #fcb69f);
+    }
+    
+    .chat-title {
+      flex: 1;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .upgrade-box {
+      margin-top: auto;
+      background: linear-gradient(135deg, #a6c0fe, #f68084);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .upgrade-box::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      z-index: 0;
+    }
+    
+    .upgrade-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .pro-badge {
+      background-color: white;
+      color: #f68084;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    
+    .upgrade-text {
+      font-size: 13px;
+      margin-bottom: 15px;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Main Content Styles */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    
+    .welcome-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .welcome-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #dfe6e9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+    
+    .welcome-avatar::before {
+      content: '';
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.2;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+    }
+    
+    .welcome-avatar i {
+      font-size: 32px;
+      color: var(--primary);
+    }
+    
+    .welcome-users {
+      position: absolute;
+      display: flex;
+    }
+    
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-left: -12px;
+      background-color: #dfe6e9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--text-dark);
+    }
+    
+    .user-avatar:nth-child(1) {
+      background-color: #74b9ff;
+      z-index: 5;
+    }
+    
+    .user-avatar:nth-child(2) {
+      background-color: #55efc4;
+      z-index: 4;
+    }
+    
+    .user-avatar:nth-child(3) {
+      background-color: #ffeaa7;
+      z-index: 3;
+    }
+    
+    .user-avatar:nth-child(4) {
+      background-color: #fab1a0;
+      z-index: 2;
+    }
+    
+    .user-avatar:nth-child(5) {
+      background-color: #a29bfe;
+      z-index: 1;
+    }
+    
+    .welcome-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      background: linear-gradient(90deg, var(--primary), var(--accent1), var(--accent2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .welcome-subtitle {
+      font-size: 18px;
+      color: var(--text-light);
+      max-width: 600px;
+      margin-bottom: 40px;
+    }
+    
+    .search-bar {
+      width: 100%;
+      max-width: 600px;
+      background-color: white;
+      border-radius: var(--border-radius);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 40px;
+      transition: all 0.3s ease;
+    }
+    
+    .search-bar:focus-within {
+      box-shadow: var(--hover-shadow);
+      transform: translateY(-2px);
+    }
+    
+    .search-bar i {
+      color: var(--text-light);
+      margin-right: 10px;
+    }
+    
+    .search-input {
+      border: none;
+      outline: none;
+      font-size: 16px;
+      flex: 1;
+      color: var(--text-dark);
+    }
+    
+    .search-input::placeholder {
+      color: var(--text-light);
+    }
+    
+    .shortcut-cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      max-width: 1000px;
+      margin-top: 20px;
+    }
+    
+    .shortcut-card {
+      width: 280px;
+      background-color: white;
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .shortcut-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--hover-shadow);
+    }
+    
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      font-size: 22px;
+      color: white;
+    }
+    
+    .productivity-icon {
+      background: linear-gradient(135deg, var(--accent2), #81ecec);
+    }
+    
+    .onboarding-icon {
+      background: linear-gradient(135deg, var(--accent3), #ffeaa7);
+    }
+    
+    .voice-icon {
+      background: linear-gradient(135deg, var(--accent1), #ff8dc7);
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .card-desc {
+      font-size: 14px;
+      color: var(--text-light);
+      line-height: 1.5;
+    }
+    
+    /* Chat Interface Styles (hidden by default) */
+    .chat-interface {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .chat-header {
+      padding: 20px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .chat-title-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .chat-title-area h2 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .chat-actions {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: white;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      color: var(--text-light);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    .messages-container {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+    
+    .message {
+      display: flex;
+      gap: 15px;
+      max-width: 80%;
+    }
+    
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    
+    .ai-avatar {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+    
+    .user-message-avatar {
+      background: linear-gradient(135deg, var(--accent1), var(--accent4));
+      color: white;
+    }
+    
+    .message-content {
+      background-color: white;
+      padding: 15px 20px;
+      border-radius: 18px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    
+    .message.user .message-content {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .message-time {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: 5px;
+    }
+    
+    .input-container {
+      padding: 20px 30px;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .input-box {
+      display: flex;
+      background-color: white;
+      border-radius: var(--border-radius);
+      padding: 8px 20px;
+      box-shadow: var(--card-shadow);
+    }
+    
+    .input-area {
+      flex: 1;
+      border: none;
+      outline: none;
+      resize: none;
+      padding: 10px 0;
+      min-height: 24px;
+      max-height: 150px;
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text-dark);
+    }
+    
+    .input-actions {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      padding-bottom: 10px;
+    }
+    
+    .input-action {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .input-action:hover {
+      color: var(--primary);
+    }
+    
+    .send-btn {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+    
+    .send-btn:hover {
+      transform: scale(1.05);
+      color: white;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+      .sidebar {
+        width: 280px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        left: -320px;
+        height: 100%;
+        z-index: 1000;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+      }
+      
+      .sidebar.active {
+        left: 0;
+      }
+      
+      .mobile-toggle {
+        display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      .welcome-title {
+        font-size: 24px;
+      }
+      
+      .welcome-subtitle {
+        font-size: 16px;
+      }
+      
+      .shortcut-cards {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .message {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="app-title">
+      <div class="logo">
+        <i class="fas fa-comment-dots"></i>
+      </div>
+      <h1>ColorChat.AI</h1>
+    </div>
+    
+    <button class="new-chat-btn">
+      <i class="fas fa-plus"></i>
+      新建对话
+    </button>
+    
+    <div class="nav-item active">
+      <i class="fas fa-compass"></i>
+      <span>探索</span>
+    </div>
+    
+    <div class="nav-item">
+      <i class="fas fa-layer-group"></i>
+      <span>模板</span>
+    </div>
+    
+    <div class="nav-item">
+      <i class="fas fa-file-alt"></i>
+      <span>文件</span>
+    </div>
+    
+    <div class="nav-item">
+      <i class="fas fa-history"></i>
+      <span>历史记录</span>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <div class="recent-chats-header">
+      <span>最近对话</span>
+      <i class="fas fa-ellipsis-h"></i>
+    </div>
+    
+    <div class="chat-item">
+      <div class="chat-icon design">
+        <i class="fas fa-palette"></i>
+      </div>
+      <div class="chat-title">新品牌设计方案</div>
+    </div>
+    
+    <div class="chat-item">
+      <div class="chat-icon food">
+        <i class="fas fa-utensils"></i>
+      </div>
+      <div class="chat-title">健康饮食计划</div>
+    </div>
+    
+    <div class="chat-item">
+      <div class="chat-icon productivity">
+        <i class="fas fa-tasks"></i>
+      </div>
+      <div class="chat-title">每日工作计划</div>
+    </div>
+    
+    <div class="upgrade-box">
+      <div class="upgrade-title">
+        <span>升级到</span>
+        <span class="pro-badge">PRO</span>
+      </div>
+      <p class="upgrade-text">解锁更快的响应速度、图像生成和更多高级功能</p>
+    </div>
+  </div>
+  
+  <div class="main-content">
+    <div class="welcome-screen">
+      <div class="welcome-avatar">
+        <i class="fas fa-robot"></i>
+        <div class="welcome-users">
+          <div class="user-avatar">A</div>
+          <div class="user-avatar">B</div>
+          <div class="user-avatar">C</div>
+          <div class="user-avatar">D</div>
+          <div class="user-avatar">+</div>
+        </div>
+      </div>
+      
+      <h1 class="welcome-title">你好，欢迎使用 ColorChat！👋</h1>
+      <p class="welcome-subtitle">我可以帮助你进行创意探索、解决问题、回答问题，以及更多功能。今天想聊些什么？</p>
+      
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" class="search-input" placeholder="输入你的问题或需求..." id="mainSearchInput">
+      </div>
+      
+      <div class="shortcut-cards">
+        <div class="shortcut-card">
+          <div class="card-icon productivity-icon">
+            <i class="fas fa-bolt"></i>
+          </div>
+          <h3 class="card-title">提升效率</h3>
+          <p class="card-desc">设定目标、规划时间、追踪进度，帮助你更专注地完成任务。</p>
+        </div>
+        
+        <div class="shortcut-card">
+          <div class="card-icon onboarding-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <h3 class="card-title">用户引导</h3>
+          <p class="card-desc">创建直观、友好的用户引导流程，帮助用户快速熟悉你的产品。</p>
+        </div>
+        
+        <div class="shortcut-card">
+          <div class="card-icon voice-icon">
+            <i class="fas fa-microphone"></i>
+          </div>
+          <h3 class="card-title">语音助手</h3>
+          <p class="card-desc">使用语音命令控制，解放双手，提高工作和生活效率。</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chat-interface">
+      <div class="chat-header">
+        <div class="chat-title-area">
+          <div class="chat-icon design">
+            <i class="fas fa-palette"></i>
+          </div>
+          <h2>新品牌设计方案</h2>
+        </div>
+        
+        <div class="chat-actions">
+          <div class="action-btn">
+            <i class="fas fa-share-alt"></i>
+          </div>
+          <div class="action-btn">
+            <i class="fas fa-bookmark"></i>
+          </div>
+          <div class="action-btn">
+            <i class="fas fa-ellipsis-v"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="messages-container">
+        <div class="message ai">
+          <div class="message-avatar ai-avatar">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div>
+            <div class="message-content">
+              你好！我是ColorChat助手。我可以帮你创建品牌设计方案。请告诉我你的品牌是做什么的，有什么特点或者价值观？
+            </div>
+            <div class="message-time">09:30</div>
+          </div>
+        </div>
+        
+        <div class="message user">
+          <div class="message-avatar user-message-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div>
+            <div class="message-content">
+              我的品牌是一家专注于可持续时尚的服装公司，我们使用环保材料制作服装。我们的价值观是环保、创新和舒适。
+            </div>
+            <div class="message-time">09:32</div>
+          </div>
+        </div>
+        
+        <div class="message ai">
+          <div class="message-avatar ai-avatar">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div>
+            <div class="message-content">
+              这听起来很棒！基于可持续时尚理念，我建议以下设计方向：<br><br>
+              <strong>色彩：</strong>以自然色调为主，如森林绿、土褐色、天空蓝等，体现环保理念。<br><br>
+              <strong>字体：</strong>选择简约现代的无衬线字体，体现创新性；同时可以在某些元素上使用有机形状的字体，呼应自然主题。<br><br>
+              <strong>标志：</strong>可以考虑融入叶子、水滴或循环符号等元素，象征可持续发展。<br><br>
+              你对这个方向有什么想法？或者你有已有的设计元素想要保留吗？
+            </div>
+            <div class="message-time">09:35</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="input-container">
+        <div class="input-box">
+          <textarea class="input-area" placeholder="输入消息..." rows="1"></textarea>
+          <div class="input-actions">
+            <div class="input-action">
+              <i class="fas fa-paperclip"></i>
+            </div>
+            <div class="input-action">
+              <i class="fas fa-microphone"></i>
+            </div>
+            <div class="input-action send-btn">
+              <i class="fas fa-paper-plane"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 处理侧边栏导航点击
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        navItems.forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+      });
+    });
+    
+    // 处理聊天项点击
+    const chatItems = document.querySelectorAll('.chat-item');
+    const welcomeScreen = document.querySelector('.welcome-screen');
+    const chatInterface = document.querySelector('.chat-interface');
+    
+    chatItems.forEach(item => {
+      item.addEventListener('click', () => {
+        chatItems.forEach(chat => chat.classList.remove('active'));
+        item.classList.add('active');
+        
+        // 显示聊天界面
+        welcomeScreen.style.display = 'none';
+        chatInterface.style.display = 'flex';
+      });
+    });
+    
+    // 处理新建聊天
+    const newChatBtn = document.querySelector('.new-chat-btn');
+    newChatBtn.addEventListener('click', () => {
+      // 显示欢迎屏幕
+      welcomeScreen.style.display = 'flex
